@@ -344,14 +344,14 @@ st.subheader("Connections")
 col1, col2 = st.columns(2)
 
 with col1:
-    st.write("**Arduino**")
+    st.write("*Arduino*")
     for pin, connection in experiment["connections"]["Arduino"].items():
-        st.write(f"- **{pin}** → {connection}")
+        st.write(f"- *{pin}* → {connection}")
 
 with col2:
-    st.write("**NodeMCU**")
+    st.write("*NodeMCU*")
     for pin, connection in experiment["connections"]["NodeMCU"].items():
-        st.write(f"- **{pin}** → {connection}")
+        st.write(f"- *{pin}* → {connection}")
 
 st.subheader("Code")
 
