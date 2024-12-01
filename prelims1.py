@@ -81,31 +81,41 @@ void loop() {
         },
         "code": {
             "Arduino": """
-int irPin = 7;
+#define IR_SENSOR_PIN 7 // ARDUINO 
+#define LED_PIN 9// ARDUINO  
 
 void setup() {
-  pinMode(irPin, INPUT);
-  Serial.begin(9600);
+  pinMode(IR_SENSOR_PIN, INPUT);  // Set IR sensor pin as input
+  pinMode(LED_PIN, OUTPUT);       // Set LED pin as output
 }
 
 void loop() {
-  int irState = digitalRead(irPin);
-  Serial.println(irState ? "Object Detected" : "No Object");
-  delay(100);
+  int sensorValue = digitalRead(IR_SENSOR_PIN);  // Read the IR sensor output
+  if (sensorValue == LOW) {                      // If obstacle detected
+    digitalWrite(LED_PIN, HIGH);                 // Turn on LED
+  } else {
+    digitalWrite(LED_PIN, LOW);                  // Turn off LED
+  }
+  delay(10);  // Short delay for stability
 }
 """,
             "NodeMCU": """
-int irPin = D2;
+#define IR_SENSOR_PIN D5  // NODE MCU
+#define LED_PIN D6        // NODE MCU
 
 void setup() {
-  pinMode(irPin, INPUT);
-  Serial.begin(9600);
+  pinMode(IR_SENSOR_PIN, INPUT);  // Set IR sensor pin as input
+  pinMode(LED_PIN, OUTPUT);       // Set LED pin as output
 }
 
 void loop() {
-  int irState = digitalRead(irPin);
-  Serial.println(irState ? "Object Detected" : "No Object");
-  delay(100);
+  int sensorValue = digitalRead(IR_SENSOR_PIN);  // Read the IR sensor output
+  if (sensorValue == LOW) {                      // If obstacle detected
+    digitalWrite(LED_PIN, HIGH);                 // Turn on LED
+  } else {
+    digitalWrite(LED_PIN, LOW);                  // Turn off LED
+  }
+  delay(10);  // Short delay for stability
 }
 """
         }
@@ -131,31 +141,37 @@ void loop() {
         },
         "code": {
             "Arduino": """
-int potPin = A0;
+int potPin = A0;         // Pin connected to potentiometer
+int ledPin = 9;          // PWM pin connected to LED
+int potValue = 0;        // Variable to store potentiometer value
+int pwmValue = 0;        // Variable to store PWM output
 
 void setup() {
-  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);  // Set LED pin as output
 }
 
 void loop() {
-  int potValue = analogRead(potPin);
-  Serial.print("Potentiometer Value: ");
-  Serial.println(potValue);
-  delay(500);
+  potValue = analogRead(potPin);              // Read potentiometer value (0-1023)
+  pwmValue = map(potValue, 0, 1023, 0, 255);  // Map value to PWM range (0-255)
+  analogWrite(ledPin, pwmValue);              // Write PWM value to LED
+  delay(10);                                  // Small delay for stability
 }
 """,
             "NodeMCU": """
-int potPin = A0;
+int potPin = A0;         // Pin connected to potentiometer (A0 on NodeMCU)
+int ledPin = D1;         // PWM pin connected to LED (D1 or other PWM-enabled pin)
+int potValue = 0;        // Variable to store potentiometer value
+int pwmValue = 0;        // Variable to store PWM output
 
 void setup() {
-  Serial.begin(9600);
+  pinMode(ledPin, OUTPUT);  // Set LED pin as output
 }
 
 void loop() {
-  int potValue = analogRead(potPin);
-  Serial.print("Potentiometer Value: ");
-  Serial.println(potValue);
-  delay(500);
+  potValue = analogRead(potPin);              // Read potentiometer value (0-1023)
+  pwmValue = map(potValue, 0, 1023, 0, 255);  // Map value to PWM range (0-255)
+  analogWrite(ledPin, pwmValue);              // Write PWM value to LED
+  delay(10);                                  // Small delay for stability
 }
 """
         }
@@ -183,39 +199,45 @@ void loop() {
             "Arduino": """
 #include <Servo.h>
 
-Servo myServo;
-int servoPin = 9;
+Servo myServo;  // Create a servo object
 
 void setup() {
-  myServo.attach(servoPin);
+  myServo.attach(9); // ARDunio
+
 }
 
 void loop() {
-  myServo.write(0); // Move to 0 degrees
-  delay(1000);
-  myServo.write(90); // Move to 90 degrees
-  delay(1000);
-  myServo.write(180); // Move to 180 degrees
-  delay(1000);
+  for (int angle = 0; angle <= 180; angle++) {  // Rotate from 0° to 180°
+    myServo.write(angle);  // Move the servo to the specified angle
+    delay(15);  // Wait for the servo to reach the position
+  }
+
+  for (int angle = 180; angle >= 0; angle--) {  // Rotate back from 180° to 0°
+    myServo.write(angle);  // Move the servo to the specified angle
+    delay(15);  // Wait for the servo to reach the position
+  }
 }
 """,
             "NodeMCU": """
 #include <Servo.h>
 
-Servo myServo;
-int servoPin = D2;
+Servo myServo;  // Create a servo object
 
 void setup() {
-  myServo.attach(servoPin);
+   myServo.attach(D4);
+
 }
 
 void loop() {
-  myServo.write(0); // Move to 0 degrees
-  delay(1000);
-  myServo.write(90); // Move to 90 degrees
-  delay(1000);
-  myServo.write(180); // Move to 180 degrees
-  delay(1000);
+  for (int angle = 0; angle <= 180; angle++) {  // Rotate from 0° to 180°
+    myServo.write(angle);  // Move the servo to the specified angle
+    delay(15);  // Wait for the servo to reach the position
+  }
+
+  for (int angle = 180; angle >= 0; angle--) {  // Rotate back from 180° to 0°
+    myServo.write(angle);  // Move the servo to the specified angle
+    delay(15);  // Wait for the servo to reach the position
+  }
 }
 """
         }
@@ -245,9 +267,10 @@ void loop() {
         "code": {
             "Arduino": """
 #include <Wire.h>
-#include <LiquidCrystal_I2C.h>
+#include <LiquidCrystal.h>
 
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+// Initialize the LCD with the pin configuration for parallel connection
+LiquidCrystal lcd(12,11,5,4,3,2);
 
 void setup() {
   lcd.init();
