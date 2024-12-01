@@ -26,38 +26,61 @@ experiments = {
             "Arduino": """
 #include <SoftwareSerial.h>
 
-SoftwareSerial BTserial(0, 1); // RX | TX
+SoftwareSerial Bluetooth(2, 3); // RX -> Pin 2, TX -> Pin 3
+char data = 0;
 
 void setup() {
-  Serial.begin(9600);
-  BTserial.begin(9600);
+  Bluetooth.begin(9600); // Start HC-05 communication
+  pinMode(8, OUTPUT); 
+  pinMode(9, OUTPUT);  
+  pinMode(10, OUTPUT);  
+  pinMode(11, OUTPUT); 
 }
 
 void loop() {
-  if (BTserial.available()) {
-    Serial.write(BTserial.read());
-  }
-  if (Serial.available()) {
-    BTserial.write(Serial.read());
+  if (Bluetooth.available() > 0) { // Check if data is received
+    data = Bluetooth.read(); // Read the incoming data
+    if (data != '\n') { // Ignore newline characters
+      Bluetooth.print("Received: ");
+      Bluetooth.println(data);
+    }
+    // Control LEDs
+    if (data == 'a') digitalWrite(8, HIGH);  
+    else if (data == 'b') digitalWrite(8, LOW); 
+    if (data == 'c') digitalWrite(9, HIGH);  
+    else if (data == 'd') digitalWrite(9, LOW); 
+    if (data == 'e') digitalWrite(10, HIGH);  
+    else if (data == 'f') digitalWrite(10, LOW); 
+    if (data == 'g') digitalWrite(11, HIGH);  
+    else if (data == 'h') digitalWrite(11, LOW); 
   }
 }
 """,
             "NodeMCU": """
 #include <SoftwareSerial.h>
 
-SoftwareSerial BTserial(D2, D3); // RX | TX
+SoftwareSerial Bluetooth(D1, D2); // RX -> D1, TX -> D2
 
 void setup() {
-  Serial.begin(9600);
-  BTserial.begin(9600);
+  Serial.begin(9600); // Start serial monitor
+  Bluetooth.begin(9600); // Start Bluetooth communication
+  Serial.println("NodeMCU Ready!");
 }
 
 void loop() {
-  if (BTserial.available()) {
-    Serial.write(BTserial.read());
+  // Send commands to Arduino through HC-05
+  if (Serial.available() > 0) {
+    char command = Serial.read(); // Read user input from Serial Monitor
+    Bluetooth.write(command); // Send the command to Arduino
+    Serial.print("Sent: ");
+    Serial.println(command);
   }
-  if (Serial.available()) {
-    BTserial.write(Serial.read());
+
+  // Read and display any response from Arduino
+  if (Bluetooth.available() > 0) {
+    char response = Bluetooth.read();
+    Serial.print("Received from Arduino: ");
+    Serial.println(response);
   }
 }
 """
