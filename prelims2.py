@@ -60,27 +60,42 @@ void loop() {
 #include <SoftwareSerial.h>
 
 SoftwareSerial Bluetooth(D1, D2); // RX -> D1, TX -> D2
+char data = 0; // Variable to store received data
 
 void setup() {
-  Serial.begin(9600); // Start serial monitor
-  Bluetooth.begin(9600); // Start Bluetooth communication
-  Serial.println("NodeMCU Ready!");
+  Bluetooth.begin(9600); // Initialize Bluetooth communication
+  Serial.begin(9600);    // Start serial monitor
+  Serial.println("NodeMCU with Bluetooth Ready!");
+
+  // Set GPIO pins as outputs for LEDs
+  pinMode(D5, OUTPUT); 
+  pinMode(D6, OUTPUT);  
+  pinMode(D7, OUTPUT);  
+  pinMode(D8, OUTPUT);
 }
 
 void loop() {
-  // Send commands to Arduino through HC-05
-  if (Serial.available() > 0) {
-    char command = Serial.read(); // Read user input from Serial Monitor
-    Bluetooth.write(command); // Send the command to Arduino
-    Serial.print("Sent: ");
-    Serial.println(command);
+  // Check if data is received from Bluetooth
+  if (Bluetooth.available() > 0) {
+    data = Bluetooth.read(); // Read incoming data
+    Serial.print("Received: ");
+    Serial.println(data);    // Display received data on Serial Monitor
+
+    // Control GPIO pins based on the received command
+    if (data == 'a') digitalWrite(D5, HIGH);  
+    else if (data == 'b') digitalWrite(D5, LOW); 
+    if (data == 'c') digitalWrite(D6, HIGH);  
+    else if (data == 'd') digitalWrite(D6, LOW); 
+    if (data == 'e') digitalWrite(D7, HIGH);  
+    else if (data == 'f') digitalWrite(D7, LOW); 
+    if (data == 'g') digitalWrite(D8, HIGH);  
+    else if (data == 'h') digitalWrite(D8, LOW); 
   }
 
-  // Read and display any response from Arduino
-  if (Bluetooth.available() > 0) {
-    char response = Bluetooth.read();
-    Serial.print("Received from Arduino: ");
-    Serial.println(response);
+  // Optional: Monitor serial input for testing purposes
+  if (Serial.available() > 0) {
+    char command = Serial.read();
+    Bluetooth.write(command); // Forward to Bluetooth for testing
   }
 }
 """
